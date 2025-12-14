@@ -22,12 +22,13 @@ cat <<EOF > "$OUTPUT"
   <ol>
 EOF
 
-# Generowanie listy plików z datą i rozmiarem
+# Generowanie listy plików z datą i rozmiarem w czytelnych jednostkach
 find . -maxdepth 1 -type f -name "*.pdf" | sort | while read -r file; do
     fname=$(basename "$file")
-    size=$(stat -c %s "$file")              # rozmiar w bajtach
-    mtime=$(stat -c %y "$file" | cut -d' ' -f1)  # data modyfikacji (YYYY-MM-DD)
-    echo "    <li><a href=\"$fname\">$fname</a><span class=\"meta\">($mtime, ${size} B)</span></li>" >> "$OUTPUT"
+    size=$(stat -c %s "$file")                         # rozmiar w bajtach
+    human_size=$(numfmt --to=iec --suffix=B "$size")   # np. 15K, 2.3M, 1.1G
+    mtime=$(stat -c %y "$file" | cut -d' ' -f1)        # data modyfikacji (YYYY-MM-DD)
+    echo "    <li><a href=\"$fname\">$fname</a><span class=\"meta\">($mtime, $human_size)</span></li>" >> "$OUTPUT"
 done
 
 cat <<EOF >> "$OUTPUT"
